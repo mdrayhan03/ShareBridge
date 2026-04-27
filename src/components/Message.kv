@@ -1,0 +1,61 @@
+<Message> :
+    orientation: 'horizontal'
+    spacing: '10dp'
+    padding: '10dp'
+    size_hint: 0.7, None
+    adaptive_height: True
+
+    MDCard:
+        size_hint: None, None
+        size: "50dp", "50dp"
+        pos_hint: {'top': 1}
+        md_bg_color: 0, 0.7, 0.9, 1
+        radius: [50, ]
+        ripple_behavior: True
+        
+        MDLabel:
+            text: root.username[0].upper() if root.username else "D"
+            halign: "center"
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: '10dp'
+        adaptive_height: True
+
+        MDLabel:
+            text: '@ ' + root.username
+            font_style: 'Label'
+            role: 'medium'
+            adaptive_height: True
+            bold: True
+        
+        MDCard:
+            id: msg_content
+            line_color: 0.2, 0.2, 0.2, 0.8
+            md_bg_color: 0, 0.7, 0.9, 1
+            radius: [12, ]
+            ripple_behavior: True
+            size_hint_y: None
+            height: self.minimum_height  # Card grows with the text
+            orientation: "vertical"
+            padding: "10dp"
+            spacing: "5dp"
+
+            MDLabel:
+                text: root.message
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                adaptive_height: True
+                opacity: 1 if root.message else 0
+                height: self.texture_size[1] if root.message else 0
+        
+        MDLabel:
+            text: root.timestamp
+            halign: 'right'
+            font_style: 'Label'
+            role: 'small'
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+            adaptive_height: True

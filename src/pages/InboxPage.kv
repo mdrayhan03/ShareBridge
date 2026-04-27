@@ -1,0 +1,27 @@
+<InboxPageScreen>:
+    MDNavigationLayout:
+
+        MDScreenManager:
+            MDScreen:
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    spacing: "20dp"
+                    size_hint_x: 1
+
+                    Header:
+                        id: header
+
+                    InboxLayout:
+                        id: inbox_list
+
+                    MessageSend:
+                        id: message_input_bar
+                        on_send: root.send_message_logic()
+                
+        MDNavigationDrawer:
+            id: right_drawer
+            anchor: "right"
+            radius: [dp(16), 0, 0, dp(16)]
+
+            MDNavigationDrawerMenu:
+                id: active_users_menu

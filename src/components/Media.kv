@@ -1,0 +1,27 @@
+<MediaWidget>:
+    orientation: 'vertical'
+    adaptive_height: True
+    spacing: "5dp"
+    padding: "10dp"
+    md_bg_color: 0.2, 0.2, 0.2, 0.5
+    radius: [8, 8, 8, 8]
+    
+    MDBoxLayout:
+        orientation: 'horizontal'
+        adaptive_height: True
+        spacing: "10dp"
+        
+        MDIcon:
+            icon: "file"
+            pos_hint: {"center_y": .5}
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+            
+        MDLabel:
+            text: root.file_name
+            adaptive_height: True
+            pos_hint: {"center_y": .5}
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+            shorten: True
+            shorten_from: 'right'

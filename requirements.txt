@@ -1,0 +1,6 @@
+kivy
+kivymd @ https://github.com/kivymd/KivyMD/archive/master.zip
+websockets
+pydantic
+aiohttp
+plyer

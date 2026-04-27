@@ -1,0 +1,45 @@
+<Join>:
+    orientation: 'vertical'
+    spacing: '10dp'
+    size_hint: None, None
+    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+    adaptive_height: True
+    width: '400dp'
+
+    MDLabel:
+        text: 'User Name'
+        font_style : "Headline"
+        role : "small"
+        halign: "left"
+        adaptive_height: True
+    
+    MDTextField:
+        id: user_field
+        mode: "outlined"
+        MDTextFieldHintText:
+            text: "User name"
+    
+    MDLabel:
+        text: 'Full Name'
+        font_style : "Headline"
+        role : "small"
+        halign: "left"
+        adaptive_height: True
+    
+    MDTextField:
+        id: full_name_field
+        mode: "outlined"
+        MDTextFieldHintText:
+            text: "Full name"
+
+    MDButton:
+        size_hint_x: 1
+        radius: [10, 10, 10, 10] 
+        
+        pos_hint: {"center_x": .5}
+
+        on_release: 
+            root.parent.parent.process_join()
+
+        MDButtonText: 
+            text: 'Join'

@@ -1,0 +1,22 @@
+<OpeningPageScreen>:
+    MDFloatLayout:
+        
+        MDBoxLayout:
+            orientation: 'vertical'
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            adaptive_size: True
+            spacing: "24dp"
+            
+            MDCircularProgressIndicator:
+                size_hint: None, None
+                size: "48dp", "48dp"
+                pos_hint: {'center_x': 0.5}
+                active: True
+                
+            MDLabel:
+                text: "Connecting to ShareBridge..."
+                halign: "center"
+                font_style: "Title"
+                role: "medium"
+                adaptive_size: True
+                pos_hint: {'center_x': 0.5}

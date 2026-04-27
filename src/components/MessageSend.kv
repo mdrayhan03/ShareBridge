@@ -1,0 +1,54 @@
+<MessageSend>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    md_bg_color: 0.1, 0.1, 0.1, 1
+    radius: [15, 15, 15, 15]
+
+    MDBoxLayout:
+        id: files_preview_box
+        orientation: 'vertical'
+        size_hint_y: None
+        height: "0dp"
+        opacity: 0
+
+        MDScrollView:
+            do_scroll_x: True
+            do_scroll_y: False
+            
+            MDBoxLayout:
+                id: files_container
+                orientation: 'horizontal'
+                adaptive_width: True
+                size_hint_y: None
+                height: "50dp"
+                spacing: '10dp'
+                padding: ['10dp', '5dp', '10dp', '5dp']
+
+    MDBoxLayout:
+        orientation: 'horizontal'
+        spacing: '5dp'
+        padding: ['5dp', '10dp', '5dp', '10dp']
+        size_hint_y: None
+        height: self.minimum_height
+
+        MDIconButton:
+            icon: 'plus'
+            pos_hint: {"center_y": .5}
+            on_release: root.open_file_chooser()
+
+        MDTextField:
+            id: text_input
+            mode: "outlined"
+            multiline: True
+            hint_text: "Message"
+            size_hint_y: None
+            height: "40dp"
+            pos_hint: {"center_y": .5}
+        
+        MDIconButton:
+            icon: "send"
+            theme_text_color: "Custom"
+            text_color: 0, 0.7, 0.9, 1
+            pos_hint: {"center_y": .5}
+            on_release: root.dispatch('on_send')
