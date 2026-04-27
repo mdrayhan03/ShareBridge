@@ -36,7 +36,7 @@ class MyServer:
                     self.connected_clients[websocket] = username
                     await self.broadcast_active_users()
                 
-                elif data.get("action") == "message":
+                elif data.get("action") in ("message", "chat_message"):
                     # Broadcast to everyone else
                     out_msg = json.dumps(data)
                     for client in list(self.connected_clients.keys()):

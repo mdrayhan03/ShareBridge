@@ -23,5 +23,26 @@
             anchor: "right"
             radius: [dp(16), 0, 0, dp(16)]
 
-            MDNavigationDrawerMenu:
-                id: active_users_menu
+            MDBoxLayout:
+                orientation: 'vertical'
+
+                MDBoxLayout:
+                    adaptive_height: True
+                    padding: ["12dp", "24dp", "12dp", "12dp"]
+                    spacing: "12dp"
+                    
+                    MDIconButton:
+                        icon: "close"
+                        pos_hint: {"center_y": .5}
+                        on_release: right_drawer.set_state("close")
+                        
+                    MDLabel:
+                        text: "Active Users"
+                        bold: True
+                        pos_hint: {"center_y": .5}
+
+                MDDivider:
+
+                MDScrollView:
+                    MDList:
+                        id: active_users_menu

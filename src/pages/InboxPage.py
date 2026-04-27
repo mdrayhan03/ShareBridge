@@ -72,33 +72,15 @@ class InboxPageScreen(MDScreen):
         
         from kivy.lang import Builder
         
-        # 1. Close Button (As an Item)
-        close_kv = '''
-MDNavigationDrawerItem:
-    on_release: app.root.get_screen('InboxPage').ids.right_drawer.set_state("close")
-    MDNavigationDrawerItemLeadingIcon:
-        icon: "close"
-    MDNavigationDrawerItemText:
-        text: "Close Sidebar"
-'''
-        menu.add_widget(Builder.load_string(close_kv))
-        
-        # 2. Title Label
-        title_kv = '''
-MDNavigationDrawerLabel:
-    text: "Active Users"
-'''
-        menu.add_widget(Builder.load_string(title_kv))
-        menu.add_widget(Builder.load_string("MDNavigationDrawerDivider:"))
-        
+
         # 3. Add Users
         for user in users:
             safe_user = str(user).replace('"', '\\"')
             item_kv = f'''
-MDNavigationDrawerItem:
-    MDNavigationDrawerItemLeadingIcon:
+MDListItem:
+    MDListItemLeadingIcon:
         icon: "account-circle"
-    MDNavigationDrawerItemText:
+    MDListItemHeadlineText:
         text: "{safe_user}"
 '''
             menu.add_widget(Builder.load_string(item_kv))

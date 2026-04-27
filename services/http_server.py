@@ -16,8 +16,31 @@ class FileTransferServer:
         if not os.path.exists(file_path):
             raise web.HTTPNotFound(text="File not found")
 
-        # aiohttp handles chunked streaming automatically using FileResponse
-        return web.FileResponse(file_path)
+        file_size = os.path.getsize(file_path)
+        
+        # Bypass aiohttp's FileResponse to avoid Windows [WinError 87] with 2GB+ files
+        response = web.StreamResponse()
+        response.headers['Content-Type'] = 'application/octet-stream'
+        response.headers['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
+        response.headers['Content-Length'] = str(file_size)
+        
+        await response.prepare(request)
+        
+        import asyncio
+        loop = asyncio.get_running_loop()
+        
+        try:
+            with open(file_path, 'rb') as f:
+                chunk_size = 1024 * 1024 * 2 # 2MB chunks
+                while True:
+                    chunk = await loop.run_in_executor(None, f.read, chunk_size)
+                    if not chunk:
+                        break
+                    await response.write(chunk)
+        except ConnectionResetError:
+            pass # Client disconnected early
+            
+        return response
 
     async def start(self):
         runner = web.AppRunner(self.app)

@@ -1,0 +1,40 @@
+<ProfileSettings>:
+    orientation: 'vertical'
+    padding: "24dp"
+    spacing: "24dp"
+    
+    MDLabel:
+        text: "Profile Information"
+        font_size: "24sp"
+        bold: True
+        adaptive_height: True
+        theme_text_color: "Custom"
+        text_color: 1, 1, 1, 1
+        
+    MDDivider:
+    
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: "20dp"
+        adaptive_height: True
+        
+        MDTextField:
+            id: username_input
+            mode: "filled"
+            MDTextFieldHintText:
+                text: "Username"
+                
+        MDTextField:
+            id: fullname_input
+            mode: "filled"
+            MDTextFieldHintText:
+                text: "Full Name"
+                
+        MDButton:
+            style: "filled"
+            on_release: root.save_profile()
+            pos_hint: {"right": 1}
+            MDButtonText:
+                text: "Save Changes"
+                
+    MDWidget:

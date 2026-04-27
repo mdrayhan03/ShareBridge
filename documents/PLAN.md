@@ -41,6 +41,17 @@
    - Upgraded the server with a "Single Source of Truth" state management system that tracks all connected clients in real-time.
    - The server instantly broadcasts connection/disconnection arrays to all users, causing the local apps to seamlessly rewrite and update their sidebar user lists without glitches or ghost users.
 
+10. **Native Downloading & UI Progress Feedback**
+   - Bypassed Windows 2GB limitations by implementing manual, chunked `StreamResponse` streaming in the HTTP server.
+   - Replaced external browser hooks with native Kivy-based async `aiohttp` download loops saving direct to the local `Downloads` folder.
+   - Added `MDLinearProgressIndicator` to display live percentage-based streaming progress, and swapped unsupported Android toasts with cross-platform KivyMD `MDSnackbar` alerts.
+   - Upgraded download buttons to disable and turn into a checkmark icon automatically upon completion.
+
+11. **Modular Settings Architecture & Real-Time Sync**
+   - Extracted hardcoded UI layouts into a clean, component-based architecture (`SettingsSidebar`, `ProfileSettings`).
+   - Built a robust Settings Page allowing users to modify their `account.json` username/fullname on the fly.
+   - **Dynamic Name Sync**: When a profile is saved, the app instantly broadcasts a new `"connect"` metadata packet to the active WebSocket server over LAN, causing all connected peers to update their sidebars with the new username seamlessly without requiring a server reboot.
+
 ## 🛠️ Architecture & Best Practices
 - **Virtual Environment (`venv`)**: Migrate the project to a localized `venv` to strictly manage Kivy, KivyMD, and Websockets versions and prevent system-wide package conflicts.
 - **Production Builds**: Maintained distinct build specifications for Windows (`PyInstaller` with hidden console) and Android (`Buildozer` with `READ/WRITE_EXTERNAL_STORAGE` and `INTERNET` permissions).
