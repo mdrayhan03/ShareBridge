@@ -13,9 +13,8 @@ jobs:
   # ---------------- Android ----------------
   build-android:
     runs-on: ubuntu-latest
-    # Android packaging (esp. pydantic v2's Rust core) can fail under
-    # python-for-android. Don't let it block the desktop releases — the
-    # release job still publishes whatever built. See documents/CI_RELEASE.md.
+    # Safety net: the APK build hasn't been verified end-to-end yet, so don't
+    # let an Android failure block the desktop releases. Remove once confirmed.
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4

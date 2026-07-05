@@ -217,15 +217,14 @@ jobs:
   (installable, but a debug APK). For a signed release APK you'd switch to
   `buildozer android release` and add keystore signing via secrets — keep the
   **same keystore** for every version or Android refuses the update.
-- **Android requirements are incomplete / risky.** `buildozer.spec` currently
-  lists `python3,kivy,kivymd,aiohttp,zeroconf,websockets`. It is **missing
-  `pydantic` and `plyer`** (both are imported by the app), and lists an unused
-  `zeroconf`. Worse, **pydantic v2 needs a Rust core that python-for-android
-  can't easily build**, so the APK step may fail regardless. That is why the
-  Android job is marked `continue-on-error` — the desktop releases still ship.
-  To actually produce an APK you'll need to resolve the pydantic-on-Android
-  situation (e.g. drop pydantic from the protocol layer, or pin a pure-Python
-  alternative) and add `plyer` to the requirements.
+- **Android build status.** The old blocker — pydantic v2's Rust core, which
+  python-for-android can't build — has been removed: the protocol layer is now
+  a dependency-free pure-Python schema, and `buildozer.spec` requirements were
+  fixed (added `plyer`, dropped the unused `zeroconf`, bumped the version). The
+  Android APK should now build. It is still marked `continue-on-error` as a
+  safety net because the APK build hasn't been verified end-to-end yet (KivyMD
+  2.0 from a zip archive under p4a can need extra care); once it's confirmed on
+  a real build, you can remove `continue-on-error` so a broken APK fails loudly.
 - **First Android build is slow:** the Buildozer action downloads the Android
   SDK/NDK on the first run (several minutes). Subsequent runs reuse the cache.
 - **Cost:** free for public repositories. Private repos consume Actions minutes

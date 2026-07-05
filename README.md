@@ -9,7 +9,7 @@ ShareBridge is a high-performance, locally-networked group chat and massive file
 - **Automated Network Discovery**: A UDP broadcaster/listener (port 37020) finds the host on the local network automatically — no manual IP entry. Same-machine instances are found via a loopback beacon and a local-server probe, so discovery works even where OS firewalls block LAN broadcast.
 - **Secure File Sharing**: Files are shared over a **token registry** — each attached file is exposed only under a random token (`/download/<token>`), never as a raw filesystem path. Nothing outside what the user explicitly shares is reachable, and local paths never leak.
 - **Peer-to-Peer Transfers**: Every device runs its own HTTP file server, so **any** participant can share files — not just the host. A dedicated `aiohttp` server streams binary data in chunks, handling 20GB+ files without memory overload.
-- **Strict Data Validation**: Every JSON packet is parsed and validated through `Pydantic` models (a discriminated union), so malformed messages are dropped instead of crashing the app.
+- **Strict Data Validation**: Every JSON packet is parsed and validated through a lightweight, dependency-free schema layer, so malformed messages are dropped instead of crashing the app (and it packages cleanly on Android — no native dependency).
 - **Multi-File Attachments**: A horizontally-scrolling preview bar lets you attach multiple files, grouped into a single chat bubble on the receiver's end.
 - **Live Active-Users Sidebar**: A responsive `MDNavigationDrawer` shows a real-time list of connected users, broadcast by the server as a single source of truth.
 - **Settings**:
@@ -26,7 +26,6 @@ ShareBridge is a high-performance, locally-networked group chat and massive file
 - **Kivy & KivyMD 2.0** — frontend UI
 - **WebSockets** — real-time messaging & event state
 - **Aiohttp** — high-performance HTTP binary streaming
-- **Pydantic** — packet validation & serialization
 - **Plyer** — native OS file chooser integration
 
 ## ⬇️ Download & Install

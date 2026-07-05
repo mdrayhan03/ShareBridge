@@ -16,11 +16,11 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,md
 
 # (str) Application versioning
-version = 0.1
+version = 1.0.0
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,kivymd,aiohttp,zeroconf,websockets
+requirements = python3,kivy,kivymd,aiohttp,websockets,plyer
 
 # (list) Permissions - Critical for massive file transfers!
 android.permissions = INTERNET, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, FOREGROUND_SERVICE, WAKE_LOCK
