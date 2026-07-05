@@ -60,6 +60,11 @@
 
 ## 🚀 Upcoming Features & Roadmap
 
+### Phase 0: Automatic Host Migration
+- When the host goes offline, elect a new host automatically (deterministic
+  join-order election, staggered takeover timeouts, auto-reconnect + user
+  notifications). Full design: [HOST_MIGRATION_PLAN.md](HOST_MIGRATION_PLAN.md).
+
 ### Phase 1: Protocol Upgrade & 1-to-1 Messaging
 - **Private Inboxes:** Transition the app from the current "Group Chat" lobby into a **1-to-1 Direct Messaging** system. Users will click on an active account in the right sidebar to open a private, direct line of communication with them.
 - **Background Android Service**: In Android, network servers get suspended when the screen locks. Implement Kivy's `Foreground Service` so transfers can continue even when the app is minimized.
