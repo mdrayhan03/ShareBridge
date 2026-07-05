@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ShareBridge — Local Wi-Fi chat & massive file sharing</title>
+<meta name="description" content="Chat and share massive files with everyone on your Wi-Fi — no internet, no accounts, no cloud. Free for Windows, macOS, Linux and Android." />
+<style>
+  :root {
+    --bg: #0d0d10;
+    --panel: #16161b;
+    --panel-2: #1d1d24;
+    --border: #2a2a33;
+    --text: #ececf2;
+    --muted: #9a9aa6;
+    --faint: #6b6b76;
+    --accent: #ffb34d;
+    --accent-2: #ff9d2e;
+    --radius: 16px;
+    --maxw: 1080px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+  section { scroll-margin-top: 80px; }
+  .eyebrow { color: var(--accent); font-weight: 600; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+  h2.title { font-size: 30px; letter-spacing: -0.02em; margin: 8px 0 10px; }
+  .sub { color: var(--muted); font-size: 17px; max-width: 640px; }
+  .center { text-align: center; }
+  .center .sub { margin-left: auto; margin-right: auto; }
+
+  /* Nav */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(13,13,16,.72); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 62px; }
+  nav .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; }
+  nav .links { display: flex; gap: 26px; align-items: center; }
+  nav .links a { color: var(--muted); font-size: 15px; transition: color .15s; }
+  nav .links a:hover { color: var(--text); }
+  nav .gh { color: var(--accent) !important; font-weight: 600; }
+  @media (max-width: 720px) { nav .links a:not(.gh) { display: none; } }
+
+  /* Hero */
+  header.hero {
+    position: relative; text-align: center; padding: 84px 0 56px; overflow: hidden;
+  }
+  header.hero::before {
+    content: ""; position: absolute; inset: -40% 0 auto 0; height: 460px;
+    background: radial-gradient(600px 260px at 50% 0, rgba(255,179,77,.16), transparent 70%);
+    pointer-events: none;
+  }
+  .logo { font-size: 68px; line-height: 1; }
+  h1 { font-size: clamp(38px, 6vw, 54px); letter-spacing: -0.03em; margin: 14px 0 8px; }
+  .hero .tagline { color: var(--muted); font-size: 20px; max-width: 640px; margin: 0 auto; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px; margin-top: 22px;
+    padding: 6px 14px; border-radius: 999px; background: var(--panel-2);
+    border: 1px solid var(--border); font-size: 14px; color: var(--muted);
+  }
+  .badge b { color: var(--accent); font-weight: 600; }
+  .cta-row { margin-top: 28px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px; padding: 14px 26px;
+    border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; border: none;
+    background: var(--accent); color: #201400; transition: transform .08s, background .15s;
+  }
+  .btn:hover { background: var(--accent-2); transform: translateY(-1px); }
+  .btn .sub2 { font-weight: 400; opacity: .8; font-size: 13px; }
+  .btn.ghost { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+  .btn.ghost:hover { background: #262630; }
+
+  /* Generic section spacing */
+  .block { padding: 56px 0; }
+  .block.tight { padding: 40px 0; }
+
+  /* Features */
+  .grid { display: grid; gap: 16px; }
+  .grid.f3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .grid.f4 { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+  .feature .ic { font-size: 26px; }
+  .feature h3 { font-size: 17px; margin: 12px 0 6px; }
+  .feature p { color: var(--muted); font-size: 14.5px; }
+
+  /* How it works */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .step .n {
+    width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center;
+    background: rgba(255,179,77,.14); color: var(--accent); font-weight: 700; border: 1px solid rgba(255,179,77,.3);
+  }
+  .step h3 { margin: 14px 0 6px; font-size: 17px; }
+  .step p { color: var(--muted); font-size: 14.5px; }
+
+  /* Downloads */
+  .downloads { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .dl { display: flex; flex-direction: column; align-items: flex-start; transition: border-color .15s; }
+  .dl.you { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .dl .os-ic { font-size: 30px; }
+  .dl h3 { margin: 12px 0 2px; font-size: 18px; }
+  .dl .meta { color: var(--muted); font-size: 13px; min-height: 18px; }
+  .dl .yourtag { color: var(--accent); font-size: 12px; font-weight: 600; margin-top: 4px; }
+  .dl a.dlbtn {
+    margin-top: 16px; align-self: stretch; text-align: center; padding: 11px 16px;
+    border-radius: 10px; font-weight: 600; font-size: 15px; background: var(--panel-2);
+    border: 1px solid var(--border); transition: background .15s, border-color .15s;
+  }
+  .dl a.dlbtn:hover { background: #262630; border-color: #3a3a45; }
+  .dl a.dlbtn.na { opacity: .4; pointer-events: none; }
+  .dl .note { color: var(--faint); font-size: 12px; margin-top: 12px; }
+  #status { text-align: center; color: var(--muted); font-size: 14px; margin-top: 22px; min-height: 20px; }
+
+  /* Developer */
+  .dev { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+  .dev .avatar {
+    width: 74px; height: 74px; border-radius: 999px; display: grid; place-items: center;
+    font-size: 34px; background: rgba(255,179,77,.14); border: 1px solid rgba(255,179,77,.3);
+  }
+  .dev h3 { font-size: 20px; }
+  .dev .role { color: var(--muted); font-size: 14.5px; margin-top: 2px; }
+  .dev .devlinks { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 10px;
+    background: var(--panel-2); border: 1px solid var(--border); font-size: 14px; color: var(--text);
+    transition: background .15s, border-color .15s;
+  }
+  .chip:hover { background: #262630; border-color: #3a3a45; }
+
+  /* Feedback */
+  .fb .fbrow { display: flex; gap: 14px; align-items: flex-start; margin-top: 6px; }
+  .fb .fbrow .n { flex: 0 0 auto; }
+  .fb code, .kbd {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 1px 7px; font-size: 13px; color: var(--accent);
+  }
+  .fb p { color: var(--muted); font-size: 14.5px; }
+  .fb .mailbtn { margin-top: 18px; }
+
+  footer { border-top: 1px solid var(--border); margin-top: 24px; padding: 34px 0 60px; text-align: center; color: var(--muted); font-size: 14px; }
+  footer a { color: var(--accent); }
+  footer .flinks { margin-bottom: 12px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  footer .lic { color: var(--faint); font-size: 13px; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+  <nav>
+    <div class="wrap">
+      <div class="brand">🌉 ShareBridge</div>
+      <div class="links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#downloads">Download</a>
+        <a href="#about">About</a>
+        <a class="gh" href="https://github.com/mdrayhan03/ShareBridge">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap">
+      <div class="logo">🌉</div>
+      <h1>ShareBridge</h1>
+      <p class="tagline">Chat and share massive files with everyone on your Wi-Fi — no internet, no accounts, no cloud.</p>
+      <div class="badge">Latest release: <b id="version">…</b></div>
+      <div class="cta-row">
+        <a class="btn" id="primaryBtn" href="#downloads"><span id="primaryText">Download</span></a>
+        <a class="btn ghost" href="#how">See how it works</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- About the app -->
+  <section class="block" id="what">
+    <div class="wrap center">
+      <div class="eyebrow">What it is</div>
+      <h2 class="title">A private space on your local network</h2>
+      <p class="sub">ShareBridge turns any Wi-Fi network into a room where devices can talk and move files
+      directly between each other. One device hosts, the rest discover it automatically, and files stream
+      peer-to-peer — so transfers are fast and nothing ever leaves your network.</p>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="block tight" id="features">
+    <div class="wrap">
+      <div class="grid f3">
+        <div class="card feature"><div class="ic">📡</div><h3>Automatic discovery</h3><p>Devices find each other on the Wi-Fi automatically — no IP addresses to type.</p></div>
+        <div class="card feature"><div class="ic">📁</div><h3>Massive file transfers</h3><p>Send 20GB+ files directly, peer-to-peer, at full LAN speed.</p></div>
+        <div class="card feature"><div class="ic">💬</div><h3>Real-time group chat</h3><p>A live, shared chat room for everyone connected on the network.</p></div>
+        <div class="card feature"><div class="ic">🚫</div><h3>Fully offline</h3><p>No internet, no accounts, no cloud. Everything stays on your network.</p></div>
+        <div class="card feature"><div class="ic">🔒</div><h3>Private by design</h3><p>Files are shared over secure tokens and never uploaded anywhere.</p></div>
+        <div class="card feature"><div class="ic">💻</div><h3>Cross-platform</h3><p>Windows, macOS, Linux and Android — from a single app.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="block" id="how">
+    <div class="wrap">
+      <div class="center"><div class="eyebrow">How it works</div><h2 class="title">Three steps, no setup</h2></div>
+      <div class="steps" style="margin-top:26px;">
+        <div class="card step"><div class="n">1</div><h3>Start</h3><p>Open ShareBridge on one device — it becomes the host and starts broadcasting on the Wi-Fi.</p></div>
+        <div class="card step"><div class="n">2</div><h3>Connect</h3><p>Other devices on the same network discover the host automatically and join the room.</p></div>
+        <div class="card step"><div class="n">3</div><h3>Share</h3><p>Chat and attach files of any size — they transfer directly between devices.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download -->
+  <section class="block" id="downloads">
+    <div class="wrap">
+      <div class="center"><div class="eyebrow">Download</div><h2 class="title">Free &amp; open-source</h2>
+        <p class="sub">Pick your platform below. Every build is free.</p></div>
+      <div class="downloads" style="margin-top:28px;">
+        <div class="card dl" data-os="windows">
+          <div class="os-ic">🪟</div><h3>Windows</h3>
+          <div class="meta" data-meta></div><div class="yourtag" data-your hidden>Your system</div>
+          <a class="dlbtn na" data-dl href="#">Download</a>
+          <div class="note">Installer. First run: “More info → Run anyway”.</div>
+        </div>
+        <div class="card dl" data-os="macos">
+          <div class="os-ic">🍎</div><h3>macOS</h3>
+          <div class="meta" data-meta></div><div class="yourtag" data-your hidden>Your system</div>
+          <a class="dlbtn na" data-dl href="#">Download</a>
+          <div class="note">First run: right-click the app → Open.</div>
+        </div>
+        <div class="card dl" data-os="linux">
+          <div class="os-ic">🐧</div><h3>Linux</h3>
+          <div class="meta" data-meta></div><div class="yourtag" data-your hidden>Your system</div>
+          <a class="dlbtn na" data-dl href="#">Download</a>
+          <div class="note">Extract, then <code>chmod +x ShareBridge</code>.</div>
+        </div>
+        <div class="card dl" data-os="android">
+          <div class="os-ic">🤖</div><h3>Android</h3>
+          <div class="meta" data-meta></div><div class="yourtag" data-your hidden>Your system</div>
+          <a class="dlbtn na" data-dl href="#">Download</a>
+          <div class="note">Enable “install unknown apps”, then open the APK.</div>
+        </div>
+      </div>
+      <div id="status"></div>
+    </div>
+  </section>
+
+  <!-- About the developer -->
+  <section class="block" id="about">
+    <div class="wrap">
+      <div class="center"><div class="eyebrow">About</div><h2 class="title">Built by one developer</h2></div>
+      <div class="card dev" style="margin-top:24px;">
+        <div class="avatar">👨‍💻</div>
+        <div style="flex:1; min-width:220px;">
+          <h3>MD Rayhan Hossain</h3>
+          <div class="role">Software Developer · creator of ShareBridge</div>
+          <div class="devlinks">
+            <a class="chip" href="https://github.com/mdrayhan03">🐙 GitHub</a>
+            <a class="chip" href="https://www.linkedin.com/in/mdrayhan03/">💼 LinkedIn</a>
+            <a class="chip" href="https://rayhan-portfolio.lovable.app/">🌐 Portfolio</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feedback & logs -->
+  <section class="block tight" id="feedback">
+    <div class="wrap">
+      <div class="center"><div class="eyebrow">Feedback &amp; support</div><h2 class="title">Found a bug? Tell me.</h2>
+        <p class="sub">Your reports directly shape ShareBridge. Reporting one takes a minute:</p></div>
+      <div class="card fb" style="margin-top:24px; max-width:720px; margin-left:auto; margin-right:auto;">
+        <div class="fbrow"><span class="n">1.</span><p>In the app, open <span class="kbd">Settings → Feedback</span> and tap <span class="kbd">Export Log</span> — the log saves to your Downloads/ShareBridge folder.</p></div>
+        <div class="fbrow"><span class="n">2.</span><p>Email me with the subject <span class="kbd">ShareBridge Report</span>, describing what you did, what went wrong, and what you expected.</p></div>
+        <div class="fbrow"><span class="n">3.</span><p><b>Attach the exported log file</b> before sending — it tells me exactly what the app did.</p></div>
+        <a class="btn mailbtn" href="mailto:mostafaizurrahman2021@gmail.com?subject=ShareBridge%20Report">✉️ Email mostafaizurrahman2021@gmail.com</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="flinks">
+        <a href="https://github.com/mdrayhan03/ShareBridge">GitHub</a>
+        <a href="https://github.com/mdrayhan03/ShareBridge/releases">All releases</a>
+        <a href="https://www.linkedin.com/in/mdrayhan03/">LinkedIn</a>
+        <a href="https://rayhan-portfolio.lovable.app/">Portfolio</a>
+      </div>
+      © 2026 MD Rayhan Hossain
+      <div class="lic">Open-source under the
+        <a href="https://github.com/mdrayhan03/ShareBridge/blob/main/LICENSE">MIT License</a>.
+      </div>
+    </div>
+  </footer>
+
+<script>
+  const REPO = "mdrayhan03/ShareBridge";
+  const RELEASES_PAGE = "https://github.com/" + REPO + "/releases";
+
+  const MATCHERS = {
+    windows: (n) => /\.exe$/i.test(n),
+    macos:   (n) => /mac/i.test(n) || /\.dmg$/i.test(n),
+    linux:   (n) => /linux/i.test(n) || /\.AppImage$/i.test(n) || /\.tar\.gz$/i.test(n),
+    android: (n) => /\.apk$/i.test(n),
+  };
+  const OS_LABEL = { windows: "Windows", macos: "macOS", linux: "Linux", android: "Android" };
+
+  function detectOS() {
+    const ua = navigator.userAgent || "";
+    if (/Android/i.test(ua)) return "android";
+    if (/Windows/i.test(ua)) return "windows";
+    if (/Mac/i.test(ua)) return "macos";
+    if (/Linux/i.test(ua)) return "linux";
+    return null;
+  }
+  function fmtSize(bytes) {
+    if (!bytes) return "";
+    const mb = bytes / (1024 * 1024);
+    return mb >= 1 ? mb.toFixed(1) + " MB" : (bytes / 1024).toFixed(0) + " KB";
+  }
+  function pickAsset(assets, os) { return (assets || []).find((a) => MATCHERS[os](a.name)); }
+
+  function renderNoReleases() {
+    document.getElementById("version").textContent = "coming soon";
+    const primary = document.getElementById("primaryBtn");
+    primary.href = RELEASES_PAGE;
+    document.getElementById("primaryText").textContent = "Watch on GitHub";
+    document.querySelectorAll(".dl").forEach((card) => {
+      const btn = card.querySelector("[data-dl]");
+      const meta = card.querySelector("[data-meta]");
+      btn.textContent = "Coming soon"; btn.href = RELEASES_PAGE; btn.classList.remove("na");
+      meta.textContent = "—";
+    });
+    document.getElementById("status").innerHTML =
+      "No public release yet — downloads will appear here automatically once the first version is published.";
+  }
+
+  async function init() {
+    const status = document.getElementById("status");
+    try {
+      const res = await fetch("https://api.github.com/repos/" + REPO + "/releases/latest", {
+        headers: { "Accept": "application/vnd.github+json" },
+      });
+      if (res.status === 404) { renderNoReleases(); return; }
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+
+      const version = data.tag_name || "";
+      document.getElementById("version").textContent = version || "—";
+
+      let found = 0;
+      document.querySelectorAll(".dl").forEach((card) => {
+        const os = card.dataset.os;
+        const asset = pickAsset(data.assets, os);
+        const btn = card.querySelector("[data-dl]");
+        const meta = card.querySelector("[data-meta]");
+        if (asset) {
+          found++;
+          btn.href = asset.browser_download_url; btn.classList.remove("na");
+          btn.textContent = "Download"; meta.textContent = fmtSize(asset.size);
+        } else {
+          btn.textContent = "Not available"; meta.textContent = "—";
+        }
+      });
+
+      const os = detectOS();
+      const primary = document.getElementById("primaryBtn");
+      const primaryText = document.getElementById("primaryText");
+      if (os) {
+        const card = document.querySelector('.dl[data-os="' + os + '"]');
+        if (card) {
+          card.classList.add("you");
+          card.querySelector("[data-your]").hidden = false;
+          const asset = pickAsset(data.assets, os);
+          if (asset) {
+            primary.href = asset.browser_download_url;
+            primaryText.innerHTML = "Download for " + OS_LABEL[os] + ' <span class="sub2">' + version + "</span>";
+          }
+        }
+      }
+
+      if (found === 0) {
+        status.innerHTML = 'No downloads on the latest release yet. See <a href="' + RELEASES_PAGE + '">all releases</a>.';
+      }
+    } catch (e) {
+      document.getElementById("version").textContent = "see releases";
+      const primary = document.getElementById("primaryBtn");
+      primary.href = RELEASES_PAGE;
+      document.getElementById("primaryText").textContent = "Go to downloads";
+      document.querySelectorAll("[data-dl]").forEach((b) => {
+        b.href = RELEASES_PAGE; b.classList.remove("na"); b.textContent = "View releases";
+      });
+      status.innerHTML = 'Couldn\'t load the latest release automatically. Browse <a href="' + RELEASES_PAGE + '">all releases</a>.';
+    }
+  }
+  init();
+</script>
+</body>
+</html>
