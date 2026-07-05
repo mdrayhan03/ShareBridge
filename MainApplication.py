@@ -2,6 +2,15 @@ import asyncio
 import threading
 import os
 
+# Configure Kivy logging BEFORE kivy is imported:
+#   - KIVY_NO_FILELOG: stop Kivy writing its own many-files logs (the "log issues");
+#     we keep a single log file ourselves (see services/app_logger.py).
+#   - KIVY_LOG_LEVEL: quiet console — no debug frame spam.
+os.environ.setdefault("KIVY_NO_FILELOG", "1")
+os.environ.setdefault("KIVY_LOG_LEVEL", "info")
+
+from kivy.logger import Logger
+
 from kivymd.app import MDApp
 from kivymd.uix.screenmanager import MDScreenManager
 from kivy.uix.screenmanager import SlideTransition
@@ -21,7 +30,12 @@ class ShareBridgeApp(MDApp):
 
     def build(self):
         from kivy.core.window import Window
-        
+
+        # Set up our single downloadable log file (see Settings > Logs & Feedback).
+        from services.app_logger import setup_file_logging
+        self.log_file_path = setup_file_logging(self.user_data_dir)
+        Logger.info(f"App: Logging to {self.log_file_path}")
+
         # Mobile specific tweaks
         Window.softinput_mode = "below_target"
         Window.bind(on_keyboard=self.on_keyboard)
@@ -69,7 +83,7 @@ class ShareBridgeApp(MDApp):
         from services.websocket.udp_discovery import discover_server_ip
         from kivy.clock import Clock
         
-        print("Looking for existing server on the network...")
+        Logger.info("Network: Looking for existing server on the network...")
         # Since discover_server_ip blocks for 3 seconds, run it in a thread to keep UI smooth
         discovered_ip = await asyncio.to_thread(discover_server_ip, 3.0)
         
@@ -80,7 +94,7 @@ class ShareBridgeApp(MDApp):
                 "We couldn't find a host on this Wi-Fi.\nDo you want to start your own server?"
             ))
         else:
-            print(f"Found Host! Connecting as client to {discovered_ip}...")
+            Logger.info(f"Network: Found host! Connecting as client to {discovered_ip}...")
             await self.connect_as_client(discovered_ip)
 
     def prompt_start_server(self, title, text):
@@ -97,14 +111,14 @@ class ShareBridgeApp(MDApp):
 
     def start_host_server_action(self):
         # Save a reference to the task so the garbage collector doesn't destroy it mid-execution
-        print("User clicked START SERVER. Initializing host...")
+        Logger.info("Network: User clicked START SERVER. Initializing host...")
         self._host_startup_task = asyncio.create_task(self._async_start_host())
 
     async def _async_start_host(self):
         from kivy.utils import platform
         import asyncio
         
-        print("Starting a new Host Server...")
+        Logger.info("Network: Starting a new host server...")
         
         if platform == 'android':
             try:
@@ -167,7 +181,7 @@ class ShareBridgeApp(MDApp):
             Clock.schedule_once(lambda dt: self.show_connected_popup(ip))
 
     def wait_action(self):
-        print("User chose to wait. Will retry in 3 seconds.")
+        Logger.info("Network: User chose to wait. Will retry in 3 seconds.")
         from kivy.clock import Clock
         Clock.schedule_once(lambda dt: asyncio.create_task(self.retry_connection()), 3)
 
@@ -175,7 +189,7 @@ class ShareBridgeApp(MDApp):
         from services.websocket.udp_discovery import discover_server_ip
         from kivy.clock import Clock
         
-        print("Retrying to find server...")
+        Logger.info("Network: Retrying to find server...")
         discovered_ip = await asyncio.to_thread(discover_server_ip, 3.0)
         
         if discovered_ip:
@@ -219,7 +233,7 @@ class ShareBridgeApp(MDApp):
 
     def on_start(self):
         """Account check and triggering the network task."""
-        print("App start!")
+        Logger.info("App: Start!")
         from services.account_control import AccountControl
         ac = AccountControl()
         username, fullname = ac.read_account()

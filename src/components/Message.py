@@ -1,5 +1,6 @@
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.properties import StringProperty, ListProperty
+from kivy.logger import Logger
 from datetime import datetime
 from src.components.Media import MediaWidget
 
@@ -80,7 +81,7 @@ class Message(MDBoxLayout) :
                 Environment = autoclass('android.os.Environment')
                 downloads_dir = os.path.join(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), "ShareBridge")
             except Exception as e:
-                print(f"Android Storage Error: {e}")
+                Logger.error(f"Message: Android storage error: {e}")
                 # Fallback if pyjnius fails for some reason
                 downloads_dir = "/storage/emulated/0/Download/ShareBridge"
         else:
@@ -97,7 +98,7 @@ class Message(MDBoxLayout) :
                     file_name = item.get("file_name", "unknown_file")
                     if url:
                         save_path = os.path.join(downloads_dir, file_name)
-                        print(f"Downloading {file_name} to {save_path}...")
+                        Logger.info(f"Message: Downloading {file_name} to {save_path}...")
                         
                         async with session.get(url) as response:
                             response.raise_for_status()
@@ -121,7 +122,7 @@ class Message(MDBoxLayout) :
                                 media_widget.download_progress = 100
                                     
             show_msg("Download complete! Saved in Downloads/ShareBridge")
-            print(f"Download complete! Saved in {downloads_dir}")
+            Logger.info(f"Message: Download complete! Saved in {downloads_dir}")
             
             # Update the button to show a success tick
             if hasattr(self, 'download_btn'):
@@ -129,5 +130,5 @@ class Message(MDBoxLayout) :
                 self.download_btn.disabled = True
                 
         except Exception as e:
-            print(f"Download Error: {e}")
+            Logger.error(f"Message: Download error: {e}")
             show_msg("Download failed! Check console.")

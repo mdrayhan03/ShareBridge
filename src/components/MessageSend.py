@@ -1,5 +1,6 @@
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.core.window import Window
+from kivy.logger import Logger
 from plyer import filechooser
 from kivy.clock import mainthread
 from kivy.properties import ListProperty
@@ -36,7 +37,7 @@ class MessageSend(MDBoxLayout):
         try:
             filechooser.open_file(multiple=True, on_selection=self._on_file_selection)
         except Exception as e:
-            print(f"Error opening file chooser: {e}")
+            Logger.error(f"MessageSend: Error opening file chooser: {e}")
 
     @mainthread
     def _on_file_selection(self, selection):

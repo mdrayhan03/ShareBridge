@@ -5,6 +5,7 @@ from kivymd.uix.dialog import (
     MDDialogButtonContainer,
 )
 from kivymd.uix.button import MDButton, MDButtonText
+from kivy.logger import Logger
 
 class ServerActionDialog:
     def __init__(self, app, title, text, on_start, on_wait):
@@ -35,13 +36,13 @@ class ServerActionDialog:
         )
         
     def _handle_wait(self, instance):
-        print("User clicked WAIT.")
+        Logger.info("ServerDialog: User clicked WAIT.")
         self.dialog.dismiss()
         if self.on_wait:
             self.on_wait()
-            
+
     def _handle_start(self, instance):
-        print("User clicked START SERVER.")
+        Logger.info("ServerDialog: User clicked START SERVER.")
         self.dialog.dismiss()
         if self.on_start:
             self.on_start()
