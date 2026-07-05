@@ -114,28 +114,23 @@ class ShareBridgeApp(MDApp):
                 mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
                 argument = ''
                 service.start(mActivity, argument)
-                print("Triggered Android Foreground Service!")
+                Logger.info("Network: Triggered Android foreground service!")
             except Exception as e:
-                print(f"Failed to start Android Service: {e}")
+                Logger.error(f"Network: Failed to start Android service: {e}")
                 
             await asyncio.sleep(2) # Give Android time to spin up the python process
             
         else:
             from services.websocket.server import MyServer
             from services.websocket.udp_discovery import start_udp_broadcaster
-            from services.http_server import FileTransferServer
             import threading
-            
+
             self.server = MyServer()
             # Start WebSocket server in background
             threading.Thread(target=self.server.start_server_logic, daemon=True).start()
             # Start broadcasting so others can find us
             threading.Thread(target=start_udp_broadcaster, daemon=True).start()
-            
-            # Start the HTTP File Server for sharing media
-            self.http_server = FileTransferServer()
-            asyncio.create_task(self.http_server.start())
-            
+
             await asyncio.sleep(1) # Let server warm up
         
         # Connect client to our own server
@@ -143,6 +138,14 @@ class ShareBridgeApp(MDApp):
 
     async def connect_as_client(self, ip):
         from services.websocket.client import MyClient
+
+        # Every peer serves its own attached files, so any participant
+        # (not just the host) can share media.
+        if not getattr(self, "http_server", None):
+            from services.http_server import FileTransferServer
+            self.http_server = FileTransferServer()
+            asyncio.create_task(self.http_server.start())
+
         self.client = MyClient(host=ip)
         self.client.on_connection_lost_callback = self.on_connection_lost
         
