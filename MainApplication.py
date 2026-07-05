@@ -222,6 +222,69 @@ class ShareBridgeApp(MDApp):
     def go_to_inbox(self):
         self.root.current = "InboxPage"
 
+    async def check_for_updates(self):
+        """Ask GitHub if a newer release exists; notify if so. Never disrupts the app."""
+        from services.update_checker import check_for_update
+        from version import __version__, GITHUB_OWNER, GITHUB_REPO
+
+        info = await check_for_update(__version__, GITHUB_OWNER, GITHUB_REPO)
+        if info:
+            Logger.info(f"Update: {info['version']} available")
+            from kivy.clock import Clock
+            Clock.schedule_once(lambda dt: self.show_update_dialog(info))
+        else:
+            Logger.info("Update: running the latest version")
+
+    def show_update_dialog(self, info):
+        from kivymd.uix.dialog import (
+            MDDialog, MDDialogHeadlineText, MDDialogSupportingText, MDDialogButtonContainer,
+        )
+        from kivymd.uix.button import MDButton, MDButtonText
+        from version import DOWNLOAD_PAGE_URL
+
+        notes = info.get("notes", "")
+        if len(notes) > 220:
+            notes = notes[:220] + "…"
+        text = f"Version {info['version']} is available."
+        if notes:
+            text += f"\n\n{notes}"
+
+        btn_later = MDButton(MDButtonText(text="LATER"), style="text")
+        btn_get = MDButton(MDButtonText(text="DOWNLOAD"), style="text")
+
+        self.update_dialog = MDDialog(
+            MDDialogHeadlineText(text="Update Available"),
+            MDDialogSupportingText(text=text),
+            MDDialogButtonContainer(btn_later, btn_get),
+        )
+
+        btn_later.bind(on_release=lambda *a: self.update_dialog.dismiss())
+
+        def _download(*a):
+            self.update_dialog.dismiss()
+            self._open_url(DOWNLOAD_PAGE_URL)
+
+        btn_get.bind(on_release=_download)
+        self.update_dialog.open()
+
+    def _open_url(self, url):
+        from kivy.utils import platform
+        if platform == "android":
+            try:
+                from jnius import autoclass
+                Intent = autoclass("android.content.Intent")
+                Uri = autoclass("android.net.Uri")
+                PythonActivity = autoclass("org.kivy.android.PythonActivity")
+                PythonActivity.mActivity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            except Exception as e:
+                Logger.error(f"Update: could not open {url}: {e}")
+        else:
+            import webbrowser
+            try:
+                webbrowser.open(url)
+            except Exception as e:
+                Logger.error(f"Update: could not open {url}: {e}")
+
     def on_connection_lost(self):
         from kivy.clock import Clock
         Clock.schedule_once(lambda dt: self.prompt_start_server(
@@ -247,6 +310,9 @@ class ShareBridgeApp(MDApp):
 
         # Launch network logic into the asyncio loop
         asyncio.create_task(self.start_network_logic())
+
+        # Quietly check for a newer release in the background (offline-safe).
+        asyncio.create_task(self.check_for_updates())
 
 if __name__ == "__main__":
     app = ShareBridgeApp()
