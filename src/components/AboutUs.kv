@@ -1,0 +1,230 @@
+<FeatureRow@MDBoxLayout>:
+    # icon + text highlight row
+    feature_icon: "check"
+    feature_text: ""
+    adaptive_height: True
+    spacing: "14dp"
+
+    MDIcon:
+        icon: root.feature_icon
+        pos_hint: {"center_y": 0.5}
+        adaptive_size: True
+        theme_text_color: "Custom"
+        text_color: 1, 0.7, 0.3, 1
+
+    MDLabel:
+        text: root.feature_text
+        adaptive_height: True
+        text_size: self.width, None
+        pos_hint: {"center_y": 0.5}
+        theme_text_color: "Custom"
+        text_color: 0.82, 0.82, 0.82, 1
+
+
+<LinkRow@MDCard>:
+    # tappable card: icon + title + subtitle + open arrow
+    link_icon: "web"
+    link_title: ""
+    link_subtitle: ""
+    orientation: 'horizontal'
+    adaptive_height: True
+    padding: "16dp"
+    spacing: "16dp"
+    md_bg_color: 0.1, 0.1, 0.1, 1
+    radius: [12, 12, 12, 12]
+    ripple_behavior: True
+
+    MDIcon:
+        icon: root.link_icon
+        pos_hint: {"center_y": 0.5}
+        adaptive_size: True
+        theme_text_color: "Custom"
+        text_color: 1, 0.7, 0.3, 1
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        adaptive_height: True
+        pos_hint: {"center_y": 0.5}
+        MDLabel:
+            text: root.link_title
+            bold: True
+            adaptive_height: True
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+        MDLabel:
+            text: root.link_subtitle
+            font_size: "12sp"
+            adaptive_height: True
+            theme_text_color: "Custom"
+            text_color: 0.6, 0.6, 0.6, 1
+
+    MDIcon:
+        icon: "open-in-new"
+        pos_hint: {"center_y": 0.5}
+        adaptive_size: True
+        theme_text_color: "Custom"
+        text_color: 0.5, 0.5, 0.5, 1
+
+
+<SectionTitle@MDLabel>:
+    bold: True
+    font_size: "17sp"
+    adaptive_height: True
+    theme_text_color: "Custom"
+    text_color: 1, 1, 1, 1
+
+
+<AboutUs>:
+    orientation: 'vertical'
+
+    MDScrollView:
+        do_scroll_x: False
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            adaptive_height: True
+            padding: "28dp"
+            spacing: "22dp"
+
+            # ---- App identity ----
+            MDBoxLayout:
+                orientation: 'horizontal'
+                adaptive_height: True
+                spacing: "16dp"
+
+                MDIcon:
+                    icon: "bridge"
+                    font_size: "56sp"
+                    pos_hint: {"center_y": 0.5}
+                    adaptive_size: True
+                    theme_text_color: "Custom"
+                    text_color: 1, 0.7, 0.3, 1
+
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    adaptive_height: True
+                    pos_hint: {"center_y": 0.5}
+                    spacing: "2dp"
+                    MDLabel:
+                        text: "ShareBridge"
+                        font_size: "28sp"
+                        bold: True
+                        adaptive_height: True
+                        theme_text_color: "Custom"
+                        text_color: 1, 1, 1, 1
+                    MDLabel:
+                        text: "Version " + root.app_version
+                        font_size: "12sp"
+                        adaptive_height: True
+                        theme_text_color: "Custom"
+                        text_color: 0.55, 0.55, 0.55, 1
+
+            MDLabel:
+                text: "Chat and share massive files with everyone on your Wi-Fi — no internet, no accounts, no cloud."
+                adaptive_height: True
+                text_size: self.width, None
+                theme_text_color: "Custom"
+                text_color: 0.72, 0.72, 0.72, 1
+
+            MDDivider:
+
+            # ---- About the project ----
+            SectionTitle:
+                text: "About the app"
+
+            MDLabel:
+                text: "ShareBridge turns any local Wi-Fi network into a private space to talk and move files between devices. One device hosts, the rest discover it automatically, and files stream directly peer-to-peer — so transfers are fast and nothing ever leaves your network."
+                adaptive_height: True
+                text_size: self.width, None
+                line_height: 1.15
+                theme_text_color: "Custom"
+                text_color: 0.82, 0.82, 0.82, 1
+
+            MDBoxLayout:
+                orientation: 'vertical'
+                adaptive_height: True
+                spacing: "14dp"
+
+                FeatureRow:
+                    feature_icon: "access-point-network"
+                    feature_text: "Finds other devices on the network automatically"
+                FeatureRow:
+                    feature_icon: "file-send-outline"
+                    feature_text: "Shares very large files (20GB+) directly, peer-to-peer"
+                FeatureRow:
+                    feature_icon: "wifi-off"
+                    feature_text: "Works fully offline — no internet or external servers"
+                FeatureRow:
+                    feature_icon: "cellphone-link"
+                    feature_text: "Runs on both Desktop and Android"
+
+            MDDivider:
+
+            # ---- About the developer ----
+            SectionTitle:
+                text: "About the developer"
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                adaptive_height: True
+                spacing: "14dp"
+
+                MDIcon:
+                    icon: "account-tie"
+                    font_size: "40sp"
+                    pos_hint: {"center_y": 0.5}
+                    adaptive_size: True
+                    theme_text_color: "Custom"
+                    text_color: 1, 0.7, 0.3, 1
+
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    adaptive_height: True
+                    pos_hint: {"center_y": 0.5}
+                    MDLabel:
+                        text: "MD Rayhan Hossain"
+                        bold: True
+                        font_size: "18sp"
+                        adaptive_height: True
+                        theme_text_color: "Custom"
+                        text_color: 1, 1, 1, 1
+                    MDLabel:
+                        text: "Software Developer · builder of ShareBridge"
+                        font_size: "13sp"
+                        adaptive_height: True
+                        theme_text_color: "Custom"
+                        text_color: 0.6, 0.6, 0.6, 1
+
+            MDDivider:
+
+            # ---- Links ----
+            SectionTitle:
+                text: "Connect with me"
+
+            LinkRow:
+                link_icon: "github"
+                link_title: "GitHub"
+                link_subtitle: "github.com/mdrayhan03"
+                on_release: root.open_link("github")
+
+            LinkRow:
+                link_icon: "linkedin"
+                link_title: "LinkedIn"
+                link_subtitle: "linkedin.com/in/mdrayhan03"
+                on_release: root.open_link("linkedin")
+
+            LinkRow:
+                link_icon: "web"
+                link_title: "Portfolio"
+                link_subtitle: "rayhan-portfolio.lovable.app"
+                on_release: root.open_link("portfolio")
+
+            # ---- Footer ----
+            MDLabel:
+                text: "© 2026 MD Rayhan Hossain · Released under the MIT License"
+                font_size: "11sp"
+                halign: "center"
+                adaptive_height: True
+                text_size: self.width, None
+                theme_text_color: "Custom"
+                text_color: 0.45, 0.45, 0.45, 1

@@ -1,15 +1,21 @@
 <SettingsPageScreen>:
     MDBoxLayout:
         orientation: 'horizontal'
-        
+
         SettingsSidebar:
             id: sidebar
-            
+
         MDBoxLayout:
             id: right_panel
             orientation: 'vertical'
             size_hint_x: 0.7
             md_bg_color: 0.15, 0.15, 0.15, 1
-            
+
             ProfileSettings:
                 id: profile_settings
+
+            LogSettings:
+                id: log_settings
+
+            AboutUs:
+                id: about_us

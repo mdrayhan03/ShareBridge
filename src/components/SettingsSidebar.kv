@@ -30,5 +30,19 @@
                     icon: "account-cog"
                 MDListItemHeadlineText:
                     text: "Profile Setting"
-                    
+
+            MDListItem:
+                on_release: app.root.get_screen('SettingsPage').show_about_us()
+                MDListItemLeadingIcon:
+                    icon: "information-outline"
+                MDListItemHeadlineText:
+                    text: "About Us"
+
+            MDListItem:
+                on_release: app.root.get_screen('SettingsPage').show_log_settings()
+                MDListItemLeadingIcon:
+                    icon: "message-alert-outline"
+                MDListItemHeadlineText:
+                    text: "Feedback"
+
     MDWidget:

@@ -1,0 +1,140 @@
+<LogSettings>:
+    orientation: 'vertical'
+
+    # Entire page scrolls as one.
+    MDScrollView:
+        do_scroll_x: False
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            adaptive_height: True
+            padding: "28dp"
+            spacing: "18dp"
+
+            # ---- Header ----
+            MDLabel:
+                text: "Feedback & Bug Reports"
+                font_size: "26sp"
+                bold: True
+                adaptive_height: True
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+
+            MDLabel:
+                text: "Your reports help make ShareBridge better. If something broke or you have an idea, send it to me — it only takes a minute."
+                adaptive_height: True
+                text_size: self.width, None
+                theme_text_color: "Custom"
+                text_color: 0.72, 0.72, 0.72, 1
+
+            MDDivider:
+
+            # ---- Steps ----
+            MDLabel:
+                text: "How to send a report"
+                bold: True
+                font_size: "17sp"
+                adaptive_height: True
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+
+            MDLabel:
+                text:
+                    ("[b]1.[/b]  Tap [b]EXPORT LOG[/b] below. The log file is saved to your "
+                    "[b]Downloads/ShareBridge[/b] folder.\n\n"
+                    "[b]2.[/b]  Email me using the address and subject shown below — either tap "
+                    "[b]COMPOSE EMAIL[/b] to open your mail app automatically, or write the mail "
+                    "yourself from any device.\n\n"
+                    "[b]3.[/b]  In the email, describe what you were doing, what went wrong, and "
+                    "what you expected to happen.\n\n"
+                    "[b]4.[/b]  [b]Attach the exported log file[/b] before sending — it tells me "
+                    "exactly what the app did.")
+                markup: True
+                adaptive_height: True
+                text_size: self.width, None
+                line_height: 1.1
+                theme_text_color: "Custom"
+                text_color: 0.82, 0.82, 0.82, 1
+
+            # ---- Contact card (email + subject, so users can also mail manually) ----
+            MDCard:
+                orientation: 'vertical'
+                adaptive_height: True
+                padding: "18dp"
+                spacing: "12dp"
+                md_bg_color: 0.1, 0.1, 0.1, 1
+                radius: [14, 14, 14, 14]
+
+                MDLabel:
+                    text: "SEND TO"
+                    font_size: "12sp"
+                    bold: True
+                    adaptive_height: True
+                    theme_text_color: "Custom"
+                    text_color: 0.55, 0.55, 0.55, 1
+
+                MDBoxLayout:
+                    adaptive_height: True
+                    spacing: "8dp"
+                    MDLabel:
+                        text: root.contact_email
+                        adaptive_height: True
+                        text_size: self.width, None
+                        theme_text_color: "Custom"
+                        text_color: 1, 0.7, 0.3, 1
+                        pos_hint: {"center_y": 0.5}
+                    MDIconButton:
+                        icon: "content-copy"
+                        style: "standard"
+                        pos_hint: {"center_y": 0.5}
+                        on_release: root.copy_email()
+
+                MDDivider:
+
+                MDLabel:
+                    text: "SUBJECT  (use this exact line so I can track it)"
+                    font_size: "12sp"
+                    bold: True
+                    adaptive_height: True
+                    theme_text_color: "Custom"
+                    text_color: 0.55, 0.55, 0.55, 1
+
+                MDBoxLayout:
+                    adaptive_height: True
+                    spacing: "8dp"
+                    MDLabel:
+                        text: root.email_subject
+                        adaptive_height: True
+                        text_size: self.width, None
+                        theme_text_color: "Custom"
+                        text_color: 0.95, 0.95, 0.95, 1
+                        pos_hint: {"center_y": 0.5}
+                    MDIconButton:
+                        icon: "content-copy"
+                        style: "standard"
+                        pos_hint: {"center_y": 0.5}
+                        on_release: root.copy_subject()
+
+            # ---- Action buttons ----
+            MDBoxLayout:
+                adaptive_height: True
+                spacing: "16dp"
+                padding: 0, "4dp", 0, 0
+
+                MDButton:
+                    style: "outlined"
+                    on_release: root.export_log()
+                    MDButtonIcon:
+                        icon: "download"
+                    MDButtonText:
+                        text: "Export Log"
+
+                MDButton:
+                    style: "filled"
+                    on_release: root.compose_email()
+                    MDButtonIcon:
+                        icon: "email"
+                    MDButtonText:
+                        text: "Compose Email"
+
+                MDWidget:
