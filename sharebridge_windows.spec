@@ -20,20 +20,19 @@ a = Analysis(
 )
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+# One-folder build: EXE holds only the launcher; COLLECT gathers the binaries,
+# libraries and data into dist/ShareBridge/ next to it. This launches faster than
+# a one-file build and is the professional pairing with the Inno Setup installer.
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
     [],
+    exclude_binaries=True,
     name='ShareBridge',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
     console=False, # IMPORTANT: Set to False to hide the ugly command prompt when running the app!
     disable_windowed_traceback=False,
     argv_emulation=False,
@@ -41,4 +40,15 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     # icon='assets/icon.ico' # Uncomment this when you add an icon to your assets folder
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='ShareBridge',
 )
