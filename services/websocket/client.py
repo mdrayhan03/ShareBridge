@@ -1,5 +1,11 @@
-import asyncio
+import logging
+
 import websockets
+
+from services.schemas import ChatMessagePacket, ConnectPacket
+
+log = logging.getLogger(__name__)
+
 
 class MyClient:
     def __init__(self, host="127.0.0.1", port=8765):
@@ -20,12 +26,12 @@ class MyClient:
         self.uri = self.find_server_uri()
         try:
             self.connection = await websockets.connect(self.uri)
-            print(f"Connected to {self.uri}")
+            log.info(f"Connected to {self.uri}")
             return True
         except Exception as e:
-            print(f"Connection failed: {e}")
+            log.error(f"Connection failed: {e}")
             return False
-    
+
     async def receive_loop(self):
         """Listens for messages indefinitely."""
         try:
@@ -34,65 +40,31 @@ class MyClient:
                 if self.on_message_callback:
                     self.on_message_callback(message)
         except websockets.ConnectionClosed:
-            print("Disconnected from server.")
+            log.info("Disconnected from server.")
             self.is_running = False
             if self.on_connection_lost_callback:
                 self.on_connection_lost_callback()
 
-    def on_message_received(self, message):
-        """This is called by receive_loop when a message arrives."""
-        print(f"Network Received: {message}")
-        if self.on_message_callback:
-            # Trigger the UI function
-            self.on_message_callback(message)
+    async def send_packet(self, packet):
+        """Serializes and sends any schema packet."""
+        if not self.connection:
+            log.warning("Not connected to server.")
+            return
+        try:
+            await self.connection.send(packet.model_dump_json())
+        except websockets.ConnectionClosed:
+            log.warning("Connection lost.")
 
     async def send_connect_message(self, username):
         """Sends the initial connection metadata."""
-        import json
-        if self.connection:
-            try:
-                await self.connection.send(json.dumps({
-                    "action": "connect",
-                    "username": username
-                }))
-            except websockets.ConnectionClosed:
-                print("Connection lost.")
+        await self.send_packet(ConnectPacket(username=username))
 
     async def send_message(self, username, message):
-        """Sends a structured JSON message."""
-        import json
-        if self.connection:
-            try:
-                await self.connection.send(json.dumps({
-                    "action": "message",
-                    "username": username,
-                    "content": message
-                }))
-            except websockets.ConnectionClosed:
-                print("Connection lost.")
-        else:
-            print("Not connected to server.")
+        """Sends a plain text chat message."""
+        await self.send_packet(ChatMessagePacket(username=username, message=message))
 
     async def close(self):
         """Closes the connection safely."""
         if self.connection:
             await self.connection.close()
-            print("Client closed.")
-
-# # --- How to use it ---
-# async def run_example():
-#     client = MyClient()
-    
-#     # Try to connect
-#     if await client.connect():
-#         # This starts the background loop
-#         client.is_running = True
-#         asyncio.create_task(client.receive_loop()) 
-        
-#         await client.send_message(username='mdrayhan03', message="Hello!")
-        
-#         print("Client is now staying alive to receive messages...")
-#         await asyncio.Future()
-
-# if __name__ == "__main__":
-#     asyncio.run(run_example())
+            log.info("Client closed.")
