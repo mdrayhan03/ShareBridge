@@ -1,5 +1,6 @@
 kivy
-kivymd @ https://github.com/kivymd/KivyMD/archive/master.zip
+# KivyMD 2.0 (unreleased) pinned to a specific commit for reproducible builds
+kivymd @ https://github.com/kivymd/KivyMD/archive/365aa9b96eee63e0e29c04de297dd222f478fce5.zip
 websockets
 pydantic
 aiohttp
