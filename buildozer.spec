@@ -15,8 +15,14 @@ source.dir = .
 # (list) Source files to include (let empty to include all the files)
 source.include_exts = py,png,jpg,kv,atlas,md
 
+# (list) Directories to exclude from the APK (dev/build/tooling folders)
+source.exclude_dirs = tests, bin, venv, .git, .github, .buildozer, build, dist, docs, documents
+
 # (str) Application versioning
 version = 1.0.0
+
+# (str) Application icon
+icon.filename = %(source.dir)s/assets/icon.png
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
@@ -27,6 +33,9 @@ android.permissions = INTERNET, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, F
 
 # (int) Target Android API, should be as high as possible.
 android.api = 33
+
+# (bool) Automatically accept the Android SDK licenses (required for headless builds)
+android.accept_sdk_license = True
 
 # (int) Minimum API your APK / AAB will support.
 android.minapi = 21
@@ -47,4 +56,4 @@ services = ShareBridgeService:service.py:foreground
 log_level = 2
 
 # (int) Display warning if buildozer is run as root (0 = False, 1 = True)
-warn_on_root = 1
+warn_on_root = 0
