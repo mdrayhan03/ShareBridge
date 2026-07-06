@@ -18,9 +18,18 @@
 # to 'universal2' if you have a universal Python.
 
 import os
+import sys
+
+# Make the project root importable so we can read the app version below.
+try:
+    _root = SPECPATH  # injected by PyInstaller: the spec's directory
+except NameError:
+    _root = os.path.abspath(os.getcwd())
+sys.path.insert(0, _root)
 
 import kivymd
-from kivy.tools.packaging.pyinstaller_hooks import hookspath, runtime_hooks
+from kivy.tools.packaging.pyinstaller_hooks import get_deps_all, hookspath, runtime_hooks
+from PyInstaller.utils.hooks import collect_submodules
 
 from version import __version__
 
@@ -29,17 +38,25 @@ kivymd_hooks_path = os.path.join(
     os.path.dirname(kivymd.__file__), "tools", "packaging", "pyinstaller"
 )
 
+# Collect ALL kivymd submodules — some (e.g. kivymd.icon_definitions) are
+# imported dynamically when resolving `icon:` names in KV and are otherwise missed.
+kivymd_submodules = collect_submodules('kivymd')
+
+# Pull in every Kivy provider (image/text/window) and its native libraries —
+# without this, the frozen app aborts with "Unable to get any Image provider".
+kivy_deps = get_deps_all()
+
 a = Analysis(
     ['MainApplication.py'],
-    pathex=[],
-    binaries=[],
+    pathex=[_root],
+    binaries=kivy_deps['binaries'],
     # Bundle our source folders so the .kv files and assets ship inside the app.
     datas=[('src', 'src'), ('assets', 'assets'), ('services', 'services')],
-    hiddenimports=['kivymd', 'aiohttp', 'websockets', 'pydantic', 'plyer'],
+    hiddenimports=['kivymd', 'aiohttp', 'websockets', 'plyer'] + kivymd_submodules + kivy_deps['hiddenimports'],
     hookspath=[kivymd_hooks_path, *hookspath()],
     hooksconfig={},
     runtime_hooks=runtime_hooks(),
-    excludes=[],
+    excludes=kivy_deps['excludes'],
     noarchive=False,
 )
 
@@ -77,7 +94,7 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='ShareBridge.app',
-    icon=None,  # set to 'assets/icon.icns' once you have an app icon
+    icon='assets/icon.icns',
     bundle_identifier='com.mdrayhan.sharebridge',
     info_plist={
         'CFBundleName': 'ShareBridge',
