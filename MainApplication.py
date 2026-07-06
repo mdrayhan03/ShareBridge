@@ -65,6 +65,28 @@ class ShareBridgeApp(MDApp):
 
         return self.sm
 
+    def on_stop(self):
+        """Clean up when the app closes: kill download links and stop servers."""
+        Logger.info("App: Stopping — clearing download links and stopping servers")
+
+        # Make every download link dead immediately (synchronous, always runs),
+        # then best-effort free the HTTP port.
+        http_server = getattr(self, "http_server", None)
+        if http_server:
+            http_server.clear_links()
+            try:
+                asyncio.create_task(http_server.stop())
+            except Exception:
+                pass
+
+        # Stop the WebSocket server (frees port 8765) if we were the host.
+        server = getattr(self, "server", None)
+        if server:
+            try:
+                server.stop_server_logic()
+            except Exception as e:
+                Logger.error(f"App: error stopping server: {e}")
+
     def on_keyboard(self, window, key, scancode, codepoint, modifier):
         if key == 27:  # 27 is the escape key / Android physical back button
             if self.sm.current == "InboxPage":
