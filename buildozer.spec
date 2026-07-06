@@ -37,6 +37,11 @@ android.api = 33
 # (bool) Automatically accept the Android SDK licenses (required for headless builds)
 android.accept_sdk_license = True
 
+# (str) Pin python-for-android to a stable release. The default (master) targets
+# Python 3.14, where pyjnius 1.7.0 fails to build ("No matching distribution").
+# This 2024 release targets Python 3.11, where all recipes build.
+p4a.branch = v2024.01.21
+
 # (int) Minimum API your APK / AAB will support.
 android.minapi = 21
 
