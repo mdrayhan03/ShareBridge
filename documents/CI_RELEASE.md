@@ -42,6 +42,18 @@ ships a single `.apk` — neither has a one-file/one-folder switch to change.
 2. Paste the workflow below.
 3. Commit and push it. From then on, pushing a `v*` tag triggers a full release build.
 
+## Building on demand (no local machine needed)
+
+You don't need to cut a release just to get an APK. After the workflow is on
+GitHub, go to **Actions → Release Build → Run workflow**. It builds all
+platforms on GitHub's runners (x86_64 — no emulation, so the Android build works
+cleanly) and, because it wasn't triggered by a tag, **skips the release step and
+leaves the apps as downloadable artifacts** on the run. Open the finished run and
+download `android-apk` (or any platform) from the **Artifacts** section.
+
+This is the recommended way to build the Android APK if your local machine is
+low on disk or is Apple Silicon (where local Docker needs slow x86_64 emulation).
+
 No secrets or tokens are needed — the built-in `GITHUB_TOKEN` (granted by
 `permissions: contents: write`) is enough to create the Release.
 
@@ -52,11 +64,13 @@ No secrets or tokens are needed — the built-in `GITHUB_TOKEN` (granted by
 ```yaml
 name: Release Build
 
-# Run only when a version tag like v1.0.0 / v2.3.1 is pushed.
+# Runs on a version tag to publish a release, or manually ("Run workflow") to
+# just build the apps and download them as artifacts (no release).
 on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
 
 permissions:
   contents: write   # needed to create the GitHub Release
@@ -178,6 +192,7 @@ jobs:
   # ---------------- Publish Release ----------------
   release:
     needs: [build-android, build-windows, build-macos, build-linux]
+    if: startsWith(github.ref, 'refs/tags/')   # only publish on a tag; manual runs just upload artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Download all build artifacts

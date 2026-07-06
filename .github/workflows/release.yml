@@ -1,10 +1,12 @@
 name: Release Build
 
-# Run only when a version tag like v1.0.0 / v2.3.1 is pushed.
+# Runs on a version tag (v1.0.0 …) to publish a release, or manually via the
+# "Run workflow" button to just build the apps and download them as artifacts.
 on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
 
 permissions:
   contents: write   # needed to create the GitHub Release
@@ -124,8 +126,11 @@ jobs:
           path: ShareBridge-linux.tar.gz
 
   # ---------------- Publish Release ----------------
+  # Only on a tag push. A manual run skips this and leaves the built apps as
+  # downloadable artifacts on the workflow run instead.
   release:
     needs: [build-android, build-windows, build-macos, build-linux]
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - name: Download all build artifacts
