@@ -169,16 +169,28 @@ class ShareBridgeApp(MDApp):
         
         if await self.client.connect():
             self.client.is_running = True
-            
-            # Identify ourselves to the server
-            await self.client.send_connect_message(self.user_data.get("username", "Unknown"))
-            
+
+            # Identify ourselves to the server (username + full name)
+            await self.client.send_connect_message(
+                self.user_data.get("username", "Unknown"),
+                self.user_data.get("fullname", ""),
+            )
+
             # Start listening for messages in the background
             asyncio.create_task(self.client.receive_loop())
-            
+
+            # If we're the host we connect to ourselves via loopback, but show
+            # the real LAN IP so the user can share it with others.
+            is_host = ip in ("127.0.0.1", "localhost")
+            if is_host:
+                from services.websocket.get_server_ip import get_lan_ip
+                display_ip = get_lan_ip()
+            else:
+                display_ip = ip
+
             # Show connected popup instead of directly going to inbox
             from kivy.clock import Clock
-            Clock.schedule_once(lambda dt: self.show_connected_popup(ip))
+            Clock.schedule_once(lambda dt: self.show_connected_popup(display_ip, is_host))
 
     def wait_action(self):
         Logger.info("Network: User chose to wait. Will retry in 3 seconds.")
@@ -200,15 +212,22 @@ class ShareBridgeApp(MDApp):
                 "Still couldn't find a host on this Wi-Fi.\nDo you want to start your own server?"
             ))
 
-    def show_connected_popup(self, ip):
+    def show_connected_popup(self, ip, is_host=False):
         from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogSupportingText, MDDialogButtonContainer
         from kivymd.uix.button import MDButton, MDButtonText
-        
+
+        if is_host:
+            headline = "Server Started"
+            supporting = f"You are hosting.\nOthers on this Wi-Fi can join you at:\n{ip}"
+        else:
+            headline = "Connected!"
+            supporting = f"Successfully connected to host at {ip}"
+
         btn_ok = MDButton(MDButtonText(text="OK"), style="text")
-        
+
         self.connected_dialog = MDDialog(
-            MDDialogHeadlineText(text="Connected!"),
-            MDDialogSupportingText(text=f"Successfully connected to host at {ip}"),
+            MDDialogHeadlineText(text=headline),
+            MDDialogSupportingText(text=supporting),
             MDDialogButtonContainer(btn_ok)
         )
         

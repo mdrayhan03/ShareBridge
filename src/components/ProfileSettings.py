@@ -22,10 +22,10 @@ class ProfileSettings(MDBoxLayout):
             app.user_data["username"] = username
             app.user_data["fullname"] = fullname
             
-            # Broadcast the updated username to the LAN server instantly
+            # Broadcast the updated username + full name to the LAN server instantly
             if getattr(app, 'client', None) and app.client.is_running:
                 import asyncio
-                asyncio.create_task(app.client.send_connect_message(username))
+                asyncio.create_task(app.client.send_connect_message(username, fullname))
             
             from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
             from kivy.metrics import dp

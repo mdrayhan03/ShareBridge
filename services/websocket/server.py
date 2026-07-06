@@ -7,6 +7,7 @@ from services.schemas import (
     ActiveUsersPacket,
     ChatMessagePacket,
     ConnectPacket,
+    UserInfo,
     parse_packet,
 )
 
@@ -18,11 +19,29 @@ class MyServer:
         self.server = None
         self.loop = None
         self.stop_event = None
-        # Map websocket -> username
+        # Map websocket -> UserInfo
         self.connected_clients = {}
+        # The first client to connect is the host (it's the host device's own
+        # client connecting to its server). Used to tag "(Host)" in the UI.
+        self.host_ws = None
+        # This machine's LAN IP, resolved once and shared with clients.
+        self.server_ip = ""
 
     async def broadcast_active_users(self):
-        packet = ActiveUsersPacket(users=list(self.connected_clients.values()))
+        if not self.server_ip:
+            try:
+                from services.websocket.get_server_ip import get_lan_ip
+                self.server_ip = get_lan_ip()
+            except Exception:
+                self.server_ip = ""
+        host_username = ""
+        if self.host_ws is not None and self.host_ws in self.connected_clients:
+            host_username = self.connected_clients[self.host_ws].username
+        packet = ActiveUsersPacket(
+            users=list(self.connected_clients.values()),
+            host=host_username,
+            server_ip=self.server_ip,
+        )
         message = packet.model_dump_json()
         for client in list(self.connected_clients.keys()):
             try:
@@ -40,7 +59,11 @@ class MyServer:
                     continue
 
                 if isinstance(packet, ConnectPacket):
-                    self.connected_clients[websocket] = packet.username
+                    self.connected_clients[websocket] = UserInfo(
+                        packet.username, packet.fullname
+                    )
+                    if self.host_ws is None:
+                        self.host_ws = websocket
                     await self.broadcast_active_users()
 
                 elif isinstance(packet, ChatMessagePacket):
@@ -55,6 +78,8 @@ class MyServer:
         finally:
             if websocket in self.connected_clients:
                 del self.connected_clients[websocket]
+                if websocket == self.host_ws:
+                    self.host_ws = None
                 await self.broadcast_active_users()
 
     async def main_serve(self):

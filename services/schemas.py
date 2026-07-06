@@ -38,26 +38,59 @@ class MediaItem(_Packet):
 class ConnectPacket(_Packet):
     action = "connect"
 
-    def __init__(self, username):
+    def __init__(self, username, fullname=""):
         if not isinstance(username, str):
             raise ValueError("username must be a string")
         self.username = username
+        self.fullname = fullname if isinstance(fullname, str) else ""
 
     def model_dump(self):
-        return {"action": "connect", "username": self.username}
+        return {"action": "connect", "username": self.username, "fullname": self.fullname}
+
+
+class UserInfo(_Packet):
+    """A connected peer, as broadcast in the active-users list."""
+
+    def __init__(self, username, fullname=""):
+        if not isinstance(username, str):
+            raise ValueError("username must be a string")
+        self.username = username
+        # Fall back to the username when no full name was provided.
+        self.fullname = fullname if (isinstance(fullname, str) and fullname) else username
+
+    def model_dump(self):
+        return {"username": self.username, "fullname": self.fullname}
 
 
 class ActiveUsersPacket(_Packet):
     action = "active_users"
 
-    def __init__(self, users=None):
+    def __init__(self, users=None, host="", server_ip=""):
         users = users if users is not None else []
-        if not isinstance(users, list) or not all(isinstance(u, str) for u in users):
-            raise ValueError("users must be a list of strings")
-        self.users = users
+        if not isinstance(users, list):
+            raise ValueError("users must be a list")
+        self.users = []
+        for u in users:
+            if isinstance(u, UserInfo):
+                self.users.append(u)
+            elif isinstance(u, dict):
+                self.users.append(UserInfo(u.get("username", ""), u.get("fullname", "")))
+            elif isinstance(u, str):  # tolerate the old username-only format
+                self.users.append(UserInfo(u))
+            else:
+                raise ValueError("users entries must be UserInfo, dict or str")
+        # Username of the host (empty if unknown).
+        self.host = host if isinstance(host, str) else ""
+        # LAN IP of the host/server, so clients can display and share it.
+        self.server_ip = server_ip if isinstance(server_ip, str) else ""
 
     def model_dump(self):
-        return {"action": "active_users", "users": list(self.users)}
+        return {
+            "action": "active_users",
+            "users": [u.model_dump() for u in self.users],
+            "host": self.host,
+            "server_ip": self.server_ip,
+        }
 
 
 class ChatMessagePacket(_Packet):
@@ -111,9 +144,13 @@ def parse_packet(raw):
     action = data.get("action")
     try:
         if action == "connect":
-            return ConnectPacket(username=data["username"])
+            return ConnectPacket(username=data["username"], fullname=data.get("fullname", ""))
         if action == "active_users":
-            return ActiveUsersPacket(users=data.get("users", []))
+            return ActiveUsersPacket(
+                users=data.get("users", []),
+                host=data.get("host", ""),
+                server_ip=data.get("server_ip", ""),
+            )
         if action == "chat_message":
             return ChatMessagePacket(
                 username=data["username"],

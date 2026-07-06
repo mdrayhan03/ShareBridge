@@ -55,9 +55,9 @@ class MyClient:
         except websockets.ConnectionClosed:
             log.warning("Connection lost.")
 
-    async def send_connect_message(self, username):
+    async def send_connect_message(self, username, fullname=""):
         """Sends the initial connection metadata."""
-        await self.send_packet(ConnectPacket(username=username))
+        await self.send_packet(ConnectPacket(username=username, fullname=fullname))
 
     async def send_message(self, username, message):
         """Sends a plain text chat message."""

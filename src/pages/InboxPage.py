@@ -2,7 +2,13 @@ import asyncio
 
 from kivy.clock import Clock
 from kivy.logger import Logger
-from kivymd.uix.list import MDListItem, MDListItemHeadlineText, MDListItemLeadingIcon
+from kivymd.uix.list import (
+    MDListItem,
+    MDListItemHeadlineText,
+    MDListItemLeadingIcon,
+    MDListItemSupportingText,
+    MDListItemTrailingSupportingText,
+)
 from kivymd.uix.screen import MDScreen
 
 from services.schemas import (
@@ -54,23 +60,39 @@ class InboxPageScreen(MDScreen):
             Logger.error(f"Inbox: UI update error: {e}")
 
     def update_active_users(self, packet):
-        """Updates the sidebar with active users."""
+        """Updates the sidebar with active users (full name, @username, host tag)."""
         if 'active_users_menu' not in self.ids:
             Logger.error("Inbox: active_users_menu not found in ids!")
             return
 
-        Logger.info(f"Inbox: Active users updated: {packet.users}")
+        Logger.info(f"Inbox: Active users updated: {[u.username for u in packet.users]}")
 
         menu = self.ids.active_users_menu
         menu.clear_widgets()
 
-        for user in packet.users:
-            menu.add_widget(
-                MDListItem(
-                    MDListItemLeadingIcon(icon="account-circle"),
-                    MDListItemHeadlineText(text=str(user)),
-                )
+        # Server IP header — shown above all users so anyone can read/share it.
+        if getattr(packet, "server_ip", ""):
+            header = MDListItem(
+                MDListItemLeadingIcon(icon="lan-connect"),
+                MDListItemHeadlineText(text=packet.server_ip),
+                MDListItemSupportingText(text="Server address"),
             )
+            menu.add_widget(header)
+            from kivymd.uix.divider import MDDivider
+            menu.add_widget(MDDivider())
+
+        for user in packet.users:
+            item = MDListItem(
+                MDListItemLeadingIcon(icon="account-circle"),
+                MDListItemHeadlineText(text=user.fullname),
+            )
+            # Show @username as a subtitle only when it differs from the name shown.
+            if user.fullname != user.username:
+                item.add_widget(MDListItemSupportingText(text=f"@{user.username}"))
+            # Tag the host with a trailing badge (always visible, never truncated).
+            if user.username == packet.host:
+                item.add_widget(MDListItemTrailingSupportingText(text="Host"))
+            menu.add_widget(item)
 
     def send_message_logic(self):
         """Handles sending messages from the UI."""

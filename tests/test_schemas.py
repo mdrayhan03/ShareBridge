@@ -3,6 +3,7 @@ from services.schemas import (
     ChatMessagePacket,
     ConnectPacket,
     MediaItem,
+    UserInfo,
     parse_packet,
 )
 
@@ -27,16 +28,40 @@ def test_media_message_roundtrip():
     assert packet.media_items[0].file_name == "a.zip"
 
 
-def test_connect_packet_parses():
+def test_connect_packet_parses_with_fullname():
+    packet = parse_packet('{"action": "connect", "username": "ray", "fullname": "MD Rayhan"}')
+    assert isinstance(packet, ConnectPacket)
+    assert packet.username == "ray"
+    assert packet.fullname == "MD Rayhan"
+
+
+def test_connect_packet_without_fullname():
     packet = parse_packet('{"action": "connect", "username": "ray"}')
     assert isinstance(packet, ConnectPacket)
     assert packet.username == "ray"
+    assert packet.fullname == ""
 
 
-def test_active_users_packet_parses():
+def test_active_users_packet_with_host_and_fullnames():
+    original = ActiveUsersPacket(
+        users=[UserInfo("ray", "MD Rayhan"), UserInfo("guest")],
+        host="ray",
+        server_ip="192.168.1.10",
+    )
+    packet = parse_packet(original.model_dump_json())
+    assert isinstance(packet, ActiveUsersPacket)
+    assert [u.username for u in packet.users] == ["ray", "guest"]
+    assert packet.users[0].fullname == "MD Rayhan"
+    assert packet.users[1].fullname == "guest"      # falls back to username
+    assert packet.host == "ray"
+    assert packet.server_ip == "192.168.1.10"
+
+
+def test_active_users_tolerates_old_string_format():
     packet = parse_packet('{"action": "active_users", "users": ["a", "b"]}')
     assert isinstance(packet, ActiveUsersPacket)
-    assert packet.users == ["a", "b"]
+    assert [u.username for u in packet.users] == ["a", "b"]
+    assert packet.host == ""
 
 
 def test_garbage_returns_none():
