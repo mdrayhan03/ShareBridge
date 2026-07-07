@@ -184,35 +184,54 @@ class ShareBridgeApp(MDApp):
 
         self.client = MyClient(host=ip)
         self.client.on_connection_lost_callback = self.on_connection_lost
-        
+
         # Link the UI to receive messages!
         inbox_screen = self.root.get_screen("InboxPage")
         self.client.on_message_callback = inbox_screen.process_incoming_msg
-        
-        if await self.client.connect():
-            self.client.is_running = True
 
-            # Identify ourselves to the server (username + full name)
-            await self.client.send_connect_message(
-                self.user_data.get("username", "Unknown"),
-                self.user_data.get("fullname", ""),
-            )
+        # Retry the connection: the host's own server — especially the Android
+        # foreground service — can take several seconds to start listening.
+        connected = False
+        for attempt in range(1, 21):
+            if await self.client.connect():
+                connected = True
+                break
+            Logger.info(f"Network: connect attempt {attempt} to {ip} failed, retrying...")
+            await asyncio.sleep(1)
 
-            # Start listening for messages in the background
-            asyncio.create_task(self.client.receive_loop())
-
-            # If we're the host we connect to ourselves via loopback, but show
-            # the real LAN IP so the user can share it with others.
-            is_host = ip in ("127.0.0.1", "localhost")
-            if is_host:
-                from services.websocket.get_server_ip import get_lan_ip
-                display_ip = get_lan_ip()
-            else:
-                display_ip = ip
-
-            # Show connected popup instead of directly going to inbox
+        if not connected:
+            Logger.error(f"Network: could not connect to {ip} after retries")
             from kivy.clock import Clock
-            Clock.schedule_once(lambda dt: self.show_connected_popup(display_ip, is_host))
+            Clock.schedule_once(lambda dt: self.prompt_start_server(
+                "Connection Failed",
+                "Couldn't connect to the server.\nDo you want to try starting it again?"
+            ))
+            return
+
+        Logger.info(f"Network: connected to {ip}")
+        self.client.is_running = True
+
+        # Identify ourselves to the server (username + full name)
+        await self.client.send_connect_message(
+            self.user_data.get("username", "Unknown"),
+            self.user_data.get("fullname", ""),
+        )
+
+        # Start listening for messages in the background
+        asyncio.create_task(self.client.receive_loop())
+
+        # If we're the host we connect to ourselves via loopback, but show
+        # the real LAN IP so the user can share it with others.
+        is_host = ip in ("127.0.0.1", "localhost")
+        if is_host:
+            from services.websocket.get_server_ip import get_lan_ip
+            display_ip = get_lan_ip()
+        else:
+            display_ip = ip
+
+        # Show connected popup instead of directly going to inbox
+        from kivy.clock import Clock
+        Clock.schedule_once(lambda dt: self.show_connected_popup(display_ip, is_host))
 
     def wait_action(self):
         Logger.info("Network: User chose to wait. Will retry in 3 seconds.")

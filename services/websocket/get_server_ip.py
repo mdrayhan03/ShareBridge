@@ -9,6 +9,7 @@ def get_lan_ip() -> str:
     often returns 127.0.0.1.
     """
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(1.0)  # never block the UI thread waiting on this
     try:
         s.connect(("8.8.8.8", 80))
         return s.getsockname()[0]

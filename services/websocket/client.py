@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 import websockets
@@ -21,11 +22,13 @@ class MyClient:
         """Builds the server URI."""
         return f"ws://{self.host}:{self.port}"
 
-    async def connect(self):
-        """Establishes the connection."""
+    async def connect(self, timeout=4.0):
+        """Establishes the connection (with a timeout so it can't hang forever)."""
         self.uri = self.find_server_uri()
         try:
-            self.connection = await websockets.connect(self.uri)
+            self.connection = await asyncio.wait_for(
+                websockets.connect(self.uri), timeout=timeout
+            )
             log.info(f"Connected to {self.uri}")
             return True
         except Exception as e:
