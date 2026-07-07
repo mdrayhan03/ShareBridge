@@ -26,7 +26,10 @@ icon.filename = %(source.dir)s/assets/icon.png
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,kivymd,aiohttp,websockets,plyer
+# KivyMD 2.0 is unreleased, so pin it to the same commit as requirements.txt
+# (a bare 'kivymd' installs the old 1.2.0 from PyPI, which lacks MDListItem etc.)
+# and list its runtime deps so python-for-android builds them too.
+requirements = python3,kivy,pillow,aiohttp,websockets,plyer,asyncgui,asynckivy,materialyoucolor,materialshapes,https://github.com/kivymd/KivyMD/archive/365aa9b96eee63e0e29c04de297dd222f478fce5.zip
 
 # (list) Permissions - Critical for massive file transfers!
 android.permissions = INTERNET, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, FOREGROUND_SERVICE, WAKE_LOCK
